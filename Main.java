@@ -23,7 +23,8 @@ public class Main {
     public static void LotteryDraw()
     {
         int totalCount = 0;
-        for (int i = 0; i < 5; i++)
+        int numberofDraws = 5;
+        for (int i = 0; i < numberofDraws; i++)
         {
             // Using a ticket number generator class to generate the winning ticket
             int[] winningNumbers = new int[6];
@@ -55,7 +56,7 @@ public class Main {
 
         System.out.println(" ");
 
-        System.out.println("Average number of times one needs to buys in order to win: " + totalCount/5);
+        System.out.println("Average number of times one needs to buys in order to win: " + totalCount/numberofDraws);
     }
 }
 
