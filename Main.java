@@ -5,19 +5,19 @@
  * Assignment: I
  * Author: Nguyen Le Bao Anh (s3616128)
  * Created on: 11/10/2018
- * Last updated on: 19/10/2018
- * Have not included the print statement in LotteryDraw() for sake of testing speed.
+ * Last updated on: 22/10/2018
+
  */
 
 package rmit.p1;
 import java.util.*;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
+import java.text.SimpleDateFormat;
+
 
 
 public class Main
 {
-    public static void main(String[] args) throws InterruptedException
+    public static void  main(String[] args) throws InterruptedException
     {
         // Main Menu
         String returnToMainMenu = "N";
@@ -29,8 +29,9 @@ public class Main
                         "Please choose an option: \n" +
                         "1. Add/Edit/Delete/View the customer list \n" +
                         "2. Add/Edit/Delete/View the Vietlot shop list \n" +
-                        "3. Draw 5 times and display the average chance to win \n" +
-                        "4. Exit \n" +
+                        "3. View weekly result \n" +
+                        "4. Average number of tickets needed to win (5 draws)\n" +
+                        "5. Exit \n" +
                         "**********************************\n" + "Your choice:");
 
                 Scanner inMainMenu = new Scanner(System.in);
@@ -39,14 +40,16 @@ public class Main
                 switch (choiceMainMenu)
                 {
                     case 1:
+                        // Customer info manipulation
                         try {
+                            // Menu
                             System.out.print("**************************\n" +
                                     "Please choose an option: \n" +
                                     "1. Add customer info\n" +
                                     "2. Edit customer info\n" +
                                     "3. Delete customer info\n" +
                                     "4. View customer info\n " +
-                                    "Enter any other key to return to main menu\n" +
+                                    "   Enter any other key to return to main menu\n" +
                                     "**************************\n" +
                                     "Your choice: ");
 
@@ -71,19 +74,21 @@ public class Main
                         }
                         catch (InputMismatchException e)
                         {
-                            System.out.println("Invalid input! Enter a number from 1-4 only.");
+                            System.out.println("");
                         }
                         break;
 
                     case 2:
+                        // Shop info manipulation
                         try {
+                            // Menu
                             System.out.print("**************************\n" +
                                     "Please choose an option: \n" +
                                     "1. Add shop info\n" +
                                     "2. Edit shop info\n" +
                                     "3. Delete shop info\n" +
                                     "4. View shop info\n " +
-                                    "Enter any other key to return to main menu\n " +
+                                    "   Enter any other key to return to main menu\n " +
                                     "**************************\n" +
                                     "Your choice: ");
 
@@ -107,30 +112,56 @@ public class Main
                         }
                         catch (InputMismatchException e)
                         {
-                            System.out.println("Invalid input! Enter a number from 1-4 only.");
+                            System.out.println("");
                         }
                         break;
                     case 3:
-                        // Lottery drawing
+                        // Weekly lottery result
 
-                        drawTicketWinningChance(5);
-                        System.out.println("Enter Y to quit or enter other any key to return to main menu: ");
-                        Scanner inCase3 = new Scanner(System.in);
-                        String case3Choice = inCase3.nextLine();
-                        returnToMainMenu = case3Choice.toUpperCase();
+                        // Importing Timer class to schedule this task
+                        Timer timer = new Timer();
+                        TimerTask myTask = new TimerTask() {
+                            @Override
+                            public void run() {
+                                System.out.println(" ");
+                                System.out.println("Counting...");
+                                System.out.println("Numbers of tickets needed to win: " + drawTicketWinningChance(1));
+                                SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+                                Date date = new Date();
+
+                                // Get current date and time
+                                System.out.println("Current date and time: " + dateFormat.format(date));
+
+                                // Calculating the date of next draw
+                                SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm:ss");
+                                SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+                                Calendar c = Calendar.getInstance();
+                                c.setTime(date); // Now use today date.
+                                c.add(Calendar.DATE, 7); // Adding 7 days
+                                String output = sdf.format(c.getTime());
+                                System.out.println("Next draw will happen on " + output + " " + timeFormat.format(date.getTime()));
+                                System.out.println("Returning to main menu...");
+
+                            }
+                        };
+                        // Scheduler
+                        timer.schedule(myTask,50,604800000); // 1 week = 604800000 milliseconds
+                        Thread.sleep(60000); // Waiting for the print statement to finish
                         break;
                     case 4:
+                        // Displaying average numbers tickets needed to win
+                        System.out.println("Average number of tickets needed to win (5 draws): " + drawTicketWinningChance(5));
+                        break;
+                    case 5:
                         // Exit program here
                         System.out.println("Program exits. Have a good day!");
                         System.exit(0);
                         break;
                     default:
-                        // Default case
-                        System.out.println("Invalid input! Enter a number from 1-4 only.");
-                        System.out.print("Enter Y to quit or enter other any key to return to main menu: ");
-                        Scanner inDefault = new Scanner(System.in);
-                        String defaultChoice = inDefault.nextLine();
-                        returnToMainMenu = defaultChoice.toUpperCase();
+                        // Default case & errors handling
+                        // Return to main menu if wrong input
+                        System.out.println("Invalid input! Enter a number from 1-5 only.");
+                        Thread.sleep(3000);
                         break;
 
 
@@ -138,33 +169,38 @@ public class Main
             }
             catch (InputMismatchException e)
             {
-                System.out.println("Invalid input! Enter a number from 1 to 4 only. Please try again");
+                // Return to main menu if wrong input
+                System.out.println("Invalid input! Enter a number from 1 to 5 only. Please try again");
+                Thread.sleep(3000);
+                System.out.println(" ");
+            }
+            catch (InterruptedException e)
+            {
+                System.out.println("InterruptedException");
                 System.out.println(" ");
             }
         }
     }
-    public static void drawLotteryWeekly()
-    {   final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
-        int[] weeklyTicket = new int[6];
-        TicketNumberGenerator weeklyWinningTicket = new TicketNumberGenerator(weeklyTicket);
-        weeklyWinningTicket.generateNumbers();
-        System.out.print("The weekly winning ticket's numbers are: ");
-        for (int i = 0; i < weeklyTicket.length; i++)
-        {
-              System.out.print(weeklyTicket[i] + " ");
-        }
-    }
-    public static void drawTicketWinningChance(int tests)
-    {
-        // TODO INCLUDE THE PRINT STATEMENT
+
+    public static int drawTicketWinningChance(int numberOfTests)
+    {   // using numberOfTests variable to differentiate outputs for case 3 & 4
         int totalCount = 0;
-        int numberOfTests = tests; // Number of tests run
         for (int i = 0; i < numberOfTests; i++)
         {   // Using a ticket number generator class to generate the winning ticket
 
             int[] winningNumbers = new int[6];
+
+            // Importing the Customer class
             TicketNumberGenerator winningTicket = new TicketNumberGenerator(winningNumbers);
             winningTicket.generateNumbers();
+            if (numberOfTests == 1)
+            {
+                System.out.print("Winning ticket's numbers are: ");
+                for (int j = 0; j < winningNumbers.length; j++)
+                {
+                    System.out.print(winningNumbers[j] + " ");
+                }
+            }
 
             // Sorting the winning numbers in ascending order in order to help with comparison
             Arrays.sort(winningNumbers);
@@ -177,6 +213,7 @@ public class Main
             Arrays.sort(drawnNumbers); // Same as above
 
             int count = 0;
+            System.out.println("Please wait. This may take awhile...");
 
             // Comparing the drawn numbers and the winning numbers
             while (!Arrays.equals(winningNumbers,drawnNumbers))
@@ -184,23 +221,39 @@ public class Main
                 drawnTicket.generateNumbers(); // Second Draw
                 Arrays.sort(drawnNumbers); // Sort again
                 count++;
+                if (numberOfTests == 1)
+                {
+                    System.out.print(count + " ");
+                }
 
+
+            }
+            if (numberOfTests == 1)
+            {
+                // Print Jackpot when won
+                System.out.print(" Jackpot!");
             }
             totalCount += count;
         }
 
         System.out.println(" ");
 
-        System.out.println("Average number of times one needs to buys in order to win: " + totalCount/numberOfTests);
+        // Return the average tickets needed to win
+        return totalCount/numberOfTests;
     }
     public static void addCustomerInfo()
-    {   // TODO DONE. BUG TESTING PHASE. COMMENT
-        String passCustomerInfo = "N";
-        while(!passCustomerInfo.equals("Y"))
+    {   // DONE. BUG TESTING PHASE. COMMENT
+        // This method is used for adding customer information to a text file which is named customer.csv
+
+        String passCustomerInfo = "N"; // End loop condition
+        while(!passCustomerInfo.equals("Y")) // Loop here in case if a user wants to add more info after done adding initially
         {
             try
             {
+                // Importing the CustomerInfo class
                 CustomerInfo customer = new CustomerInfo();
+
+                // Gathering user inputs
                 Scanner inAddCusInfo = new Scanner(System.in);
                 System.out.print("Customer's name: ");
                 String name = inAddCusInfo.nextLine();
@@ -212,15 +265,18 @@ public class Main
                 String phone = inAddCusInfo.nextLine();
                 System.out.print("Customer's email: ");
                 String email = inAddCusInfo.nextLine();
+
+                // Setters
                 customer.setName(name);
                 customer.setBirthday(birthday);
                 customer.setAddress(address);
                 customer.setPhone(phone);
                 customer.setEmail(email);
 
-
+                // Using the Customer class' addCustomerInfo method to add info to a text file
                 customer.addCustomerInfo("customer.csv");
 
+                // Return to main menu or keep adding prompt
                 Scanner inAddAnother = new Scanner(System.in);
                 System.out.print("Enter Y to return to main menu or enter any key to continue adding: ");
                 String addAnother = inAddAnother.nextLine();
@@ -236,12 +292,16 @@ public class Main
     }
     public static void addShopInfo()
     {   // TODO DONE. BUG TESTING PHASE. COMMENT
-        String passShopInfo = "N";
-        while(!passShopInfo.equals("Y"))
+        // This method is used for adding Vietlot shop information to a text file which is named shop.csv
+
+        String passShopInfo = "N"; // End loop condition
+        while(!passShopInfo.equals("Y")) // Loop here in case if a user wants to add more info after done adding initially
         {
             try
-            {
+            {   // Import the ShopInfo class
                 ShopInfo shop = new ShopInfo();
+
+                // Gathering user inputs
                 Scanner inAddCusInfo = new Scanner(System.in);
                 System.out.print("Shop's code: ");
                 String shopCode = inAddCusInfo.nextLine();
@@ -253,8 +313,15 @@ public class Main
                 String shopPhone = inAddCusInfo.nextLine();
                 System.out.print("Shop's email: ");
                 String shopEmail = inAddCusInfo.nextLine();
-                System.out.print("Shop's account balance: ");
-                String shopBalance = inAddCusInfo.nextLine();
+                System.out.print("Shop's deposit: ");
+                int shopDeposit = inAddCusInfo.nextInt();
+                System.out.print("Shop's money issuing lottery: ");
+                int shopMoneyIssuingLot = inAddCusInfo.nextInt();
+
+                // Account balance = Deposit - money issuing lottery. Convert int to String
+                String shopBalance = Integer.toString(shopDeposit - shopMoneyIssuingLot);
+
+                // Setters
                 shop.setShopCode(shopCode);
                 shop.setShopAddress(shopAddress);
                 shop.setShopOwner(shopOwner);
@@ -262,8 +329,10 @@ public class Main
                 shop.setShopEmail(shopEmail);
                 shop.setShopBalance(shopBalance);
 
+                // Using the Customer class' addCustomerInfo method to add info to a text file
                 shop.addShopInfo("shop.csv");
 
+                // Return to main menu or keep adding prompt
                 Scanner inAddAnother = new Scanner(System.in);
                 System.out.print("Enter Y to return to main menu or enter any key to continue adding: ");
                 String addAnother = inAddAnother.nextLine();
@@ -277,10 +346,14 @@ public class Main
         }
 
     }
-    public static void viewInfo(String FileName) throws InterruptedException
-    {   // TODO DONE. BUG TESTING PHASE. COMMENT
-        // Usable for both customer and shop list
+    public static void viewInfo(String FileName)
+    {
+        // This method is usable for both customer and shop list
+
+        // Importing CustomerInfo class
         CustomerInfo customer = new CustomerInfo();
+        try{
+            // Check if the file is empty. If so, return to main menu. Else, proceed.
         if (customer.checkEmptyFile(FileName))
         {
             System.out.println("File is empty. Returning to main menu...");
@@ -289,110 +362,165 @@ public class Main
         else {
             customer.viewCustomerInfo(FileName);
             boolean passViewCusInfo = false;
-            while(!passViewCusInfo)
+            while (!passViewCusInfo) // Loop here to handle wrong input
             {
                 Scanner inViewCusInfo = new Scanner(System.in);
                 System.out.print("Enter Y to return to main menu: ");
                 String viewCusInfoChoice = inViewCusInfo.nextLine().toUpperCase();
-                Thread.sleep(10);
-                if (viewCusInfoChoice.equals("Y"))
-                {
-                    Thread.interrupted();
-                    passViewCusInfo = true;
+                Thread.sleep(10); // Sleep so method wont automatically return to main menu
+                if (viewCusInfoChoice.equals("Y")) {
+                    Thread.interrupted(); // Resume based on user input
+                    passViewCusInfo = true; // Loop ends here
                 }
             }
         }
+        }
+        catch (InterruptedException e)
+        {
+            System.out.println("InterruptedException");
+            System.out.println(" ");
+        }
     }
-    public static void deleteInfo(String FileName) throws InterruptedException
+    public static void deleteInfo(String FileName)
     {
-        // TODO DONE. BUGS TESTING PHASE. COMMENT
-        // Usable for both customer and shop list
+        // This method is usable for both customer and shop list
+
+        // Importing the CustomerInfo class
         CustomerInfo customer = new CustomerInfo();
 
+        // Check if the file is empty. If so, return to main menu. Else, proceed.
         if (customer.checkEmptyFile(FileName)) {
             System.out.println("File is empty! Returning to main menu.");
         }
         else
             {
             boolean passMenuDeleteInfo = false;
-            while (!passMenuDeleteInfo)
+            while (!passMenuDeleteInfo) // Loop here to handle wrong input
             {
             try
-            {   customer.viewCustomerInfo(FileName);
+            {   customer.viewCustomerInfo(FileName); // Displaying info
+
+                // Menu
                 System.out.print("Please choose an option\n" +
                         "1. Delete a single piece of information\n" +
                         "2. Delete all\n" +
+                        "3. Return to main menu\n"+
                         "Your choice: ");
                 Scanner optionDeleteInfo = new Scanner(System.in);
                 int choiceDeleteInfo = optionDeleteInfo.nextInt();
+
+                // Delete a single line
                 if(choiceDeleteInfo == 1) {
                     boolean passDeleteCustomerInfo = false;
                     while (!passDeleteCustomerInfo) {
                         Scanner inDeleteCusInfo = new Scanner(System.in);
                         System.out.print("Enter the left-most 6 digit hexadecimal number associated with the customer you want to delete: ");
-                        String deleteCusInfoChoice = inDeleteCusInfo.nextLine().toUpperCase();
+                        String deleteCusInfoChoice = inDeleteCusInfo.nextLine().toUpperCase(); // handling lower-case user input
 
-                        if (customer.checkHexadecimalIndex(FileName, deleteCusInfoChoice)) {
-                            System.out.print("Are you sure you want to proceed (Y/N)? ");
-                            String deleteCusInfoChoice2 = inDeleteCusInfo.nextLine().toUpperCase();
+                        if (customer.checkHexadecimalIndex(FileName, deleteCusInfoChoice)) // Checking if the numbers entered exists in the list
+                        {
+                            System.out.print("Are you sure you want to proceed (Y/N)? "); // Confirmation prompt
+                            String deleteCusInfoChoice2 = inDeleteCusInfo.nextLine().toUpperCase(); // handling lower-case user input
                             if (deleteCusInfoChoice2.equals("Y")) {
-                                customer.deleteCustomerInfo(FileName, deleteCusInfoChoice);
+                                customer.deleteCustomerInfo(FileName, deleteCusInfoChoice); // Using deleteCustomerInfo method
                                 System.out.println("Deleted!");}
 
-                            if (customer.checkEmptyFile(FileName)) {
-                                System.out.println("File is empty! Returning to main menu.");
-                                Thread.sleep(4000); // Delay for 4 seconds for user to read the message
+                            if (customer.checkEmptyFile(FileName)) // Check if the file is empty again to avoid infinite loop
+                            {
+                                System.out.println("File is empty! Returning to main menu...");
+                                Thread.sleep(4000); // Delay to let user read the message
                                 passDeleteCustomerInfo = true;
                             } else {
+
+                                // Keep deleting or return to main menu prompt
                                 Scanner inDeleteCusInfo2 = new Scanner(System.in);
                                 System.out.print("Enter to Y to return main menu or enter any key to keep deleting");
-                                String deleteCusInfoChoice3 = inDeleteCusInfo2.nextLine().toUpperCase();
+                                String deleteCusInfoChoice3 = inDeleteCusInfo2.nextLine().toUpperCase(); // handling lower-case user input
                                 if (deleteCusInfoChoice3.equals("Y")) {
                                     passDeleteCustomerInfo = true;
                                 }
                             }
 
-                        } else {
+                        }
+
+                        else // Numbers do not exist in the list
+                        {
                             System.out.println(deleteCusInfoChoice + " does not exist! Try again");
                         }
 
 
-                        passMenuDeleteInfo = true;}
+                        passMenuDeleteInfo = true; // End loop here
+                    }
                 }
                 else if (choiceDeleteInfo == 2)
-                {
-                        customer.deleteAllInfo(FileName);
-                        System.out.println("All information is deleted. Returning to main menu");
+                {       Scanner inDeleteAll = new Scanner(System.in);
+                        System.out.print("Are you sure you want to delete all the information (Y/N)?: "); // Confirmation prompt
+                        String deleteAllChoice = inDeleteAll.nextLine().toUpperCase(); // handling lower-case user input
+                        if (deleteAllChoice.equals("Y"))
+                        {
+                        customer.deleteAllInfo(FileName); // deleteAllInfo from CustomerInfo class
+                        System.out.println("All information is deleted. Returning to main menu...");
+                        Thread.sleep(4000); // Delay to let user read the message
                         }
+                        else
+                        {
+                            System.out.println("Returning to main menu...");
+                            Thread.sleep(2000); // Delay to let user read the message
+                            break;
+                        }
+                }
+                else if(choiceDeleteInfo == 3)
+                {
+                    System.out.println("Returning to main menu...");
+                    Thread.sleep(2000); // Delay to let user read the message
+                    break;
+                }
 
-                else{ System.out.println("Invalid Input. Enter number from 1 to 2 only.");}
+                else{ System.out.println("Invalid Input. Enter number from 1 to 3 only.");}
                 passMenuDeleteInfo = true;
 
              }
+
+             // Errors handling
             catch (InputMismatchException e)
             {
                 System.out.println("Invalid Input!");
+            }
+            catch (InterruptedException e)
+            {
+                System.out.println("InterruptedException");
+                System.out.println(" ");
             }
             }
         }
 
     }
-    public static void editInfo(String FileName, int shoporcustomer) throws InterruptedException
-    {   //TODO LAZY WAY
-        CustomerInfo customer = new CustomerInfo();
-        System.out.println("Deleting old information");
-        Thread.sleep(2000);
-        deleteInfo(FileName);
-        System.out.println("Adding new information");
-        Thread.sleep(2000);
-        if (shoporcustomer == 1)
-        {addCustomerInfo();}
-        else
-        {addShopInfo();}
-        System.out.println("Changes saved! Returning to main menu");
-        Thread.sleep(4000);
+    public static void editInfo(String FileName, int shoporcustomer)
+    {   // shoporcustomer variable is used to determine which addinfo method to use
+        try
+        {
+            CustomerInfo customer = new CustomerInfo();
+            System.out.println("Please delete old information");
+            Thread.sleep(2000);
+            deleteInfo(FileName);
+            System.out.println("Enter new information");
+            Thread.sleep(2000);
+            if (shoporcustomer == 1) {
+                addCustomerInfo();
+            } else {
+                addShopInfo();
+            }
+            System.out.println("Changes saved! Returning to main menu");
+        }
+        catch (InterruptedException e)
+        {
+            System.out.println("InterruptedException");
+            System.out.println(" ");
+        }
     }
 }
+
+
 
 
 
