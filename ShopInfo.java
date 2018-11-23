@@ -39,7 +39,7 @@ public class ShopInfo
     private String shopEmail;
     private String shopBalance;
     private String shopFileName;
-    private String formatStr = "%-7s %-7s %-45s %-15s %-15s %-15s %-15s%n"; // use this to format the text file
+    private String formatStr = "%-7s %-7s %-45s %-22s %-15s %-15s %-15s%n"; // use this to format the text file
 
     // Use these variables below to generate random hexadecimal numbers for identification purposes
     private Random rand = new Random();

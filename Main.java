@@ -1,4 +1,7 @@
 /*
+
+import java.text.SimpleDateFormat;
+import java.util.*;
  * RMIT University Vietnam - Saigon South Campus
  * Course: COSC2081 - Programming I
  * Semester: 2018C
@@ -10,8 +13,8 @@
  */
 
 package rmit.p1;
-import java.util.*;
 import java.text.SimpleDateFormat;
+import java.util.*;
 
 
 
@@ -30,8 +33,9 @@ public class Main
                         "1. Add/Edit/Delete/View the customer list \n" +
                         "2. Add/Edit/Delete/View the Vietlot shop list \n" +
                         "3. View weekly result \n" +
-                        "4. Average number of tickets needed to win (5 draws)\n" +
-                        "5. Exit \n" +
+                        "4. Print the number of tickets needed to win in a line until jackpot (1 draw)\n" +
+                        "5. Average number of tickets needed to win (5 draws)\n" +
+                        "6. Exit \n" +
                         "**********************************\n" + "Your choice:");
 
                 Scanner inMainMenu = new Scanner(System.in);
@@ -48,7 +52,7 @@ public class Main
                                     "1. Add customer info\n" +
                                     "2. Edit customer info\n" +
                                     "3. Delete customer info\n" +
-                                    "4. View customer info\n " +
+                                    "4. View customer info\n" +
                                     "   Enter any other key to return to main menu\n" +
                                     "**************************\n" +
                                     "Your choice: ");
@@ -74,7 +78,8 @@ public class Main
                         }
                         catch (InputMismatchException e)
                         {
-                            System.out.println("");
+                            System.out.println("Returning to main menu...");
+                            Thread.sleep(2000);
                         }
                         break;
 
@@ -87,7 +92,7 @@ public class Main
                                     "1. Add shop info\n" +
                                     "2. Edit shop info\n" +
                                     "3. Delete shop info\n" +
-                                    "4. View shop info\n " +
+                                    "4. View shop info\n" +
                                     "   Enter any other key to return to main menu\n " +
                                     "**************************\n" +
                                     "Your choice: ");
@@ -112,7 +117,8 @@ public class Main
                         }
                         catch (InputMismatchException e)
                         {
-                            System.out.println("");
+                            System.out.println("Returning to main menu...");
+                            Thread.sleep(2000);
                         }
                         break;
                     case 3:
@@ -123,9 +129,7 @@ public class Main
                         TimerTask myTask = new TimerTask() {
                             @Override
                             public void run() {
-                                System.out.println(" ");
-                                System.out.println("Counting...");
-                                System.out.println("Numbers of tickets needed to win: " + drawTicketWinningChance(1));
+                                drawTicketWinningChance(1,3);
                                 SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
                                 Date date = new Date();
 
@@ -133,26 +137,33 @@ public class Main
                                 System.out.println("Current date and time: " + dateFormat.format(date));
 
                                 // Calculating the date of next draw
-                                SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm:ss");
-                                SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+                                SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm:ss"); // Format time
+                                SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy"); // Format date
                                 Calendar c = Calendar.getInstance();
                                 c.setTime(date); // Now use today date.
                                 c.add(Calendar.DATE, 7); // Adding 7 days
                                 String output = sdf.format(c.getTime());
                                 System.out.println("Next draw will happen on " + output + " " + timeFormat.format(date.getTime()));
                                 System.out.println("Returning to main menu...");
-
                             }
                         };
                         // Scheduler
                         timer.schedule(myTask,50,604800000); // 1 week = 604800000 milliseconds
-                        Thread.sleep(60000); // Waiting for the print statement to finish
+                        Thread.sleep(10000); // Waiting for the print statement to finish
                         break;
                     case 4:
-                        // Displaying average numbers tickets needed to win
-                        System.out.println("Average number of tickets needed to win (5 draws): " + drawTicketWinningChance(5));
+                        System.out.println(" ");
+
+                        System.out.println("Number of tickets needed to win: " + drawTicketWinningChance(1,4));
+                        System.out.println("Jackpot!");
+                        Thread.sleep(3000);
                         break;
                     case 5:
+                        // Displaying average numbers tickets needed to win
+                        System.out.println("Average number of tickets needed to win (5 draws): " + drawTicketWinningChance(5,5));
+                        Thread.sleep(5000);
+                        break;
+                    case 6:
                         // Exit program here
                         System.out.println("Program exits. Have a good day!");
                         System.exit(0);
@@ -160,7 +171,7 @@ public class Main
                     default:
                         // Default case & errors handling
                         // Return to main menu if wrong input
-                        System.out.println("Invalid input! Enter a number from 1-5 only.");
+                        System.out.println("Invalid input! Enter a number from 1-6 only.");
                         Thread.sleep(3000);
                         break;
 
@@ -182,8 +193,8 @@ public class Main
         }
     }
 
-    public static int drawTicketWinningChance(int numberOfTests)
-    {   // using numberOfTests variable to differentiate outputs for case 3 & 4
+    public static int drawTicketWinningChance(int numberOfTests, int caseNumber)
+    {   // using numberOfTests and caseNumber variables to differentiate outputs for case 3,4 & 5
         int totalCount = 0;
         for (int i = 0; i < numberOfTests; i++)
         {   // Using a ticket number generator class to generate the winning ticket
@@ -193,7 +204,7 @@ public class Main
             // Importing the Customer class
             TicketNumberGenerator winningTicket = new TicketNumberGenerator(winningNumbers);
             winningTicket.generateNumbers();
-            if (numberOfTests == 1)
+            if (numberOfTests == 1 && caseNumber == 3)
             {
                 System.out.print("Winning ticket's numbers are: ");
                 for (int j = 0; j < winningNumbers.length; j++)
@@ -213,7 +224,6 @@ public class Main
             Arrays.sort(drawnNumbers); // Same as above
 
             int count = 0;
-            System.out.println("Please wait. This may take awhile...");
 
             // Comparing the drawn numbers and the winning numbers
             while (!Arrays.equals(winningNumbers,drawnNumbers))
@@ -221,17 +231,12 @@ public class Main
                 drawnTicket.generateNumbers(); // Second Draw
                 Arrays.sort(drawnNumbers); // Sort again
                 count++;
-                if (numberOfTests == 1)
+                if (numberOfTests == 1 && caseNumber == 4)
                 {
                     System.out.print(count + " ");
                 }
 
 
-            }
-            if (numberOfTests == 1)
-            {
-                // Print Jackpot when won
-                System.out.print(" Jackpot!");
             }
             totalCount += count;
         }
@@ -242,7 +247,7 @@ public class Main
         return totalCount/numberOfTests;
     }
     public static void addCustomerInfo()
-    {   // DONE. BUG TESTING PHASE. COMMENT
+    {
         // This method is used for adding customer information to a text file which is named customer.csv
 
         String passCustomerInfo = "N"; // End loop condition
@@ -275,6 +280,8 @@ public class Main
 
                 // Using the Customer class' addCustomerInfo method to add info to a text file
                 customer.addCustomerInfo("customer.csv");
+                System.out.println("Added!");
+
 
                 // Return to main menu or keep adding prompt
                 Scanner inAddAnother = new Scanner(System.in);
@@ -331,6 +338,7 @@ public class Main
 
                 // Using the Customer class' addCustomerInfo method to add info to a text file
                 shop.addShopInfo("shop.csv");
+                System.out.println("Added!");
 
                 // Return to main menu or keep adding prompt
                 Scanner inAddAnother = new Scanner(System.in);
@@ -414,7 +422,7 @@ public class Main
                     boolean passDeleteCustomerInfo = false;
                     while (!passDeleteCustomerInfo) {
                         Scanner inDeleteCusInfo = new Scanner(System.in);
-                        System.out.print("Enter the left-most 6 digit hexadecimal number associated with the customer you want to delete: ");
+                        System.out.print("Enter the left-most 6 digit hexadecimal number associated with the information you want to delete: ");
                         String deleteCusInfoChoice = inDeleteCusInfo.nextLine().toUpperCase(); // handling lower-case user input
 
                         if (customer.checkHexadecimalIndex(FileName, deleteCusInfoChoice)) // Checking if the numbers entered exists in the list
@@ -453,7 +461,9 @@ public class Main
                     }
                 }
                 else if (choiceDeleteInfo == 2)
-                {       Scanner inDeleteAll = new Scanner(System.in);
+                {       // Delete all options
+
+                        Scanner inDeleteAll = new Scanner(System.in);
                         System.out.print("Are you sure you want to delete all the information (Y/N)?: "); // Confirmation prompt
                         String deleteAllChoice = inDeleteAll.nextLine().toUpperCase(); // handling lower-case user input
                         if (deleteAllChoice.equals("Y"))
@@ -500,7 +510,7 @@ public class Main
         try
         {
             CustomerInfo customer = new CustomerInfo();
-            System.out.println("Please delete old information");
+            System.out.println("Please delete old information, then add new information");
             Thread.sleep(2000);
             deleteInfo(FileName);
             System.out.println("Enter new information");
@@ -519,9 +529,3 @@ public class Main
         }
     }
 }
-
-
-
-
-
-

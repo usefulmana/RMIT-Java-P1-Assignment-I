@@ -33,7 +33,7 @@ public class CustomerInfo
     private String address;
     private String phone;
     private String email;
-    private String formatStr = "%-7s %-10s %-12s %-45s %-15s %-15s%n"; // Use this to format text file
+    private String formatStr = "%-7s %-22s %-12s %-45s %-15s %-15s%n"; // Use this to format text file
     private String customerHexaNum;
 
     // Use these variables below to generate random hexadecimal numbers for identification purposes
