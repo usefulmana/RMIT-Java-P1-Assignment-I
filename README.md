@@ -16,3 +16,8 @@ Personal objectives:
 - Exit option at every screen
 - No program-breaking bugs
 - Relatively easy to use
+
+History
+- 20/11/18 v1.0: Functional, bug tests emergency
+- 24/11/18 v1.1: Drastic change
+- 28/11/18 v2.0: Fully functional, minimal bugs
