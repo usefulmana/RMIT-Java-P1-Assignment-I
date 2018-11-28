@@ -10,10 +10,11 @@ public class TicketNumberGenerator
     }
     public void generateNumbers ()
     {
+        // Generating random numbers using Math.random
+        // Add those numbers to an array
         for (int i = 0; i < ticketNumbers.length; i++)
         {
             ticketNumbers[i] = (int) (Math.random() * (45 + 1));
         }
     }
-
 }
