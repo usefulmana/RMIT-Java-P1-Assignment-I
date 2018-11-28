@@ -18,6 +18,6 @@ Personal objectives:
 - Relatively easy to use
 
 History
-- 20/11/18 v1.0: Functional, bug tests emergency
+- 20/11/18 v1.0(alpha): Functional, bug tests emergency
 - 24/11/18 v1.1: Drastic change
-- 28/11/18 v2.0: Fully functional, minimal bugs
+- 28/11/18 v2.0(beta): Fully functional, minimal bugs, further bugs test needed, code cleanup.
