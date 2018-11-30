@@ -6,6 +6,7 @@
  * Author: Nguyen Le Bao Anh (s3616128)
  * Created on: 11/10/2018
  * Last updated on: 28/10/2018
+ * Version control: https://github.com/usefulmana/RMIT-Java-P1-Assignment-I
  */
 
 package rmit.p1;
@@ -168,7 +169,7 @@ public class Main
                         // Scheduler
 
                         timer.schedule(myTask,50,604800000); // 1 week = 604800000 milliseconds
-                        Thread.sleep(10000); // Waiting for the print statement to finish
+                        Thread.sleep(15000); // Waiting for the print statement to finish
                         break;
                     case 4:
 
@@ -335,17 +336,18 @@ public class Main
                 System.out.print("Shop's email: ");
                 String shopEmail = inAddCusInfo.nextLine();
                 System.out.print("Shop's deposit: ");
-                int shopDeposit = inAddCusInfo.nextInt();
+                double shopDeposit = inAddCusInfo.nextDouble();
                 System.out.print("Shop's money issuing lottery: ");
-                int shopMoneyIssuingLot = inAddCusInfo.nextInt();
+                double shopMoneyIssuingLot = inAddCusInfo.nextDouble();
 
-                // Account balance = Deposit - money issuing lottery. Convert int to String
-                String shopBalance = Integer.toString(shopDeposit - shopMoneyIssuingLot);
+                // Account balance = Deposit - money issuing lottery. Round up to third decimal place
+                String shopBalance = String.format("%.3f",shopDeposit - shopMoneyIssuingLot);
+
 
                 // Import the ShopInfo class
                 ShopInfo shop = new ShopInfo(shopCode,shopAddress,toTitleCase(shopOwner),shopPhone,shopEmail,shopBalance);
 
-                // Using the Customer class' addCustomerInfo method to add info to a text file
+                // Using the Shopinfo class' addShopInfo method to add info to a text file
                 shop.addShopInfo("shop.csv");
                 System.out.println("Added!");
 
@@ -358,7 +360,8 @@ public class Main
             }
             catch (InputMismatchException e)
             {
-                System.out.println("Invalid input");
+                System.out.println("Invalid input! Please enter a numbered value (ex: 12.5) for monetary values");
+                System.out.println("Please try again");
             }
         }
 
@@ -398,7 +401,7 @@ public class Main
             System.out.println(" ");
         }
     }
-    public static void deleteInfo(String FileName)
+    public static void deleteInfo(String FileName) throws InterruptedException
     {
         // This method is usable for both customer and shop list
 
@@ -408,6 +411,7 @@ public class Main
         // Check if the file is empty. If so, return to main menu. Else, proceed.
         if (customer.checkEmptyFile(FileName)) {
             System.out.println("File is empty! Returning to main menu.");
+            Thread.sleep(2000);
         }
         else
             {
@@ -545,12 +549,13 @@ public class Main
             System.out.println(" ");
         }
     }
-    public static void editCustomerInfo(String FileName) throws FileNotFoundException
+    public static void editCustomerInfo(String FileName) throws FileNotFoundException, InterruptedException
     { // This method is used to edit each individual customer's information
             CustomerInfo customer = new CustomerInfo();
             if (customer.checkEmptyFile(FileName)) // Check if file is empty
             {
                 System.out.println("File is empty! Returning to main menu.");
+                Thread.sleep(2000);
             }
             else {
 
@@ -724,12 +729,13 @@ public class Main
                     }
                 }
     }
-    public static void editShopInfo(String FileName) throws FileNotFoundException
+    public static void editShopInfo(String FileName) throws FileNotFoundException, InterruptedException
     { // Same as the editCustomerInfo method but modified for shop
         CustomerInfo customer = new CustomerInfo();
         if (customer.checkEmptyFile(FileName))
         {
             System.out.println("File is empty! Returning to main menu.");
+            Thread.sleep(2000);
         }
         else {
 
@@ -928,6 +934,7 @@ public class Main
     }
     public static String toTitleCase(String givenString) {
         // Capitalize first letter of each word
+        // TODO PERSONALIZE THIS METHOD
         String[] arr = givenString.split(" ");
         StringBuffer sb = new StringBuffer();
 
